@@ -19,7 +19,7 @@ def start_dummy_server():
 threading.Thread(target=start_dummy_server, daemon=True).start()
 
 # --- SOZLAMALAR ---
-TOKEN = os.environ.get("BOT_TOKEN", "8733278270:AAHAgD29DvrxxQNNEoR5AOv7kE5VtYMBM")
+TOKEN = os.environ.get("BOT_TOKEN", "8733278270:AAEDHLDH3SuHftwDnDKG-6E4lD3K8NgoakE")
 ADMIN_ID = 8051030380
 
 # Kanalingiz username'i (@ bering yoki username bo'lmasa ID yozing)
