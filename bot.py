@@ -1,23 +1,21 @@
 import logging
 import asyncio
 from aiogram import Bot, Dispatcher, F, types
-from aiogram.filters import CommandStart, Command
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ChatJoinRequest
+from aiogram.filters import CommandStart
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 # ==================== SOZLAMALAR ====================
+# @BotFather'dan olgan YANGI tokeningizni tirnoq ichiga yozing:
 BOT_TOKEN = "8733278270:AAGOm869v7tgtd7LY1XPIN8MfRgR-JPT1JQ"
 
-# Kanalingiz IDsi (masalan: -1001234567890) yoki username (masalan: "@kanalingiz_nomi")
-CHANNEL_ID = "@kanalingiz_nomi" 
+# Skrinshotdagi kanalingiz ma'lumotlari:
+CHANNEL_ID = "@lekxbrkfb"
+CHANNEL_INVITE_LINK = "https://t.me/lekxbrkfb"
 
-# Yopiq (zayavka) kanalingizga taklif havolasi (Invite Link)
-CHANNEL_INVITE_LINK = "https://t.me/+SizningZayavkaLinkasiz"
-
-# Kinolar bazasi: Code -> Telegram Video File ID
-# Izoh: Kinolarni bir marta botga yuborib File ID'sini joylaysiz yoki xabar matnini berishingiz mumkin
+# Kinolar bazasi (Kod -> Video havola/ID yoki Matn)
 MOVIES = {
-    "3": "BAACAgIAAxkBAAE... (3-kino video_id)",  # Yoki shunchaki text / link
-    "4": "BAACAgIAAxkBAAE... (4-kino video_id)"
+    "3": "🍿 3-sonli kino tayyor! (Bu yerga videoni yuborasiz)",
+    "4": "🍿 4-sonli kino tayyor!"
 }
 # ===================================================
 
@@ -25,7 +23,7 @@ logging.basicConfig(level=logging.INFO)
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
-# Obunani tekshirish tugmasi
+# Obuna tugmasi
 def get_sub_keyboard():
     keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
@@ -35,16 +33,15 @@ def get_sub_keyboard():
     )
     return keyboard
 
-# Obuna holatini tekshirish funksiyasi
+# Obunani tekshirish
 async def check_subscription(user_id: int) -> bool:
     try:
         member = await bot.get_chat_member(chat_id=CHANNEL_ID, user_id=user_id)
-        # Obuna bo'lgan, admin yoki kanal egasi bo'lsa True
         if member.status in ["creator", "administrator", "member"]:
             return True
         return False
-    except Exception:
-        # Agar kanal yopiq (zayavka) bo'lib, bot tekshira olmasa
+    except Exception as e:
+        print(f"Xatolik: {e}")
         return True 
 
 @dp.message(CommandStart())
@@ -53,7 +50,7 @@ async def start_handler(message: types.Message):
     if not is_sub:
         await message.answer(
             "⚠️ **Botdan foydalanish uchun avval kanalimizga obuna bo'ling!**\n\n"
-            "So'rov (zayavka) yuborganingizdan so'ng 'Obunani tekshirish' tugmasini bosing.",
+            "Kanalga a'zo bo'lgach, **'Obunani tekshirish'** tugmasini bosing.",
             reply_markup=get_sub_keyboard(),
             parse_mode="Markdown"
         )
@@ -68,7 +65,7 @@ async def check_callback(callback: types.CallbackQuery):
         await callback.message.delete()
         await callback.message.answer("✅ Obuna tasdiqlandi! Endi kino kodini yuborishingiz mumkin.")
     else:
-        await callback.answer("❌ Hali kanalga obuna bo'lmadingiz yoki so'rov yubormadingiz!", show_alert=True)
+        await callback.answer("❌ Hali kanalga obuna bo'lmadingiz!", show_alert=True)
 
 @dp.message()
 async def movie_handler(message: types.Message):
@@ -84,11 +81,10 @@ async def movie_handler(message: types.Message):
     code = message.text.strip().replace("/", "")
     if code in MOVIES:
         movie_data = MOVIES[code]
-        # Agar video file_id bo'lsa video yuboradi, aks holda matn
         if movie_data.startswith("BAAC") or movie_data.startswith("AgAC"):
             await message.answer_video(video=movie_data, caption=f"🍿 Kino kodi: {code}")
         else:
-            await message.answer(f"🍿 Siz so'ragan kino:\n{movie_data}")
+            await message.answer(f"🍿 Siz so'ragan kino ({code}):\n\n{movie_data}")
     else:
         await message.answer("❌ Bunday kodli kino topilmadi.")
 
@@ -97,4 +93,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-        
+    
