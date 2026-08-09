@@ -1,9 +1,25 @@
 import json
 import os
+import http.server
+import socketserver
+import threading
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, ContextTypes, filters
 
-TOKEN = os.environ.get("BOT_TOKEN", "8733278270:AAEZbRvV8fLQSPpX-4VcXhtYicBa7KWtjT4")
+# Render'ning port tekshiruvidan o'tish uchun kichik server
+def start_dummy_server():
+    port = int(os.environ.get("PORT", 8080))
+    handler = http.server.SimpleHTTPRequestHandler
+    try:
+        with socketserver.TCPServer(("", port), handler) as httpd:
+            httpd.serve_forever()
+    except Exception:
+        pass
+
+# Serverni fonda ishga tushirish
+threading.Thread(target=start_dummy_server, daemon=True).start()
+
+TOKEN = os.environ.get("BOT_TOKEN", "8733278270:AAHAgD29DvrxxQNNEoR5AOv7kE5VtYMBM")
 ADMIN_ID = 8051030380
 MOVIES_FILE = "movies.json"
 
@@ -58,4 +74,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-  
+    
